@@ -30,6 +30,7 @@ class AvailableIdps {
     hasApple,
     hasFirebase,
     hasGitHub,
+    hasFacebook,
   ].where((e) => e).length;
 
   /// Whether the email authentication provider is available.
@@ -46,6 +47,9 @@ class AvailableIdps {
 
   /// Whether the GitHub authentication provider is available.
   bool get hasGitHub => _isProviderAvailable<EndpointGitHubIdpBase>();
+
+  /// Whether the Facebook authentication provider is available.
+  bool get hasFacebook => _isProviderAvailable<EndpointFacebookIdpBase>();
 }
 
 /// Extension to provide information about available identity providers.

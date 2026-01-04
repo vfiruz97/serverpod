@@ -164,6 +164,20 @@ class GitHubIdpEndpoint extends EndpointGitHubIdpBase {
   }) => Future.value(_mockData.authSuccess);
 }
 
+class FacebookIdpEndpoint extends EndpointFacebookIdpBase {
+  FacebookIdpEndpoint(super.caller);
+
+  final _mockData = MockAuthData();
+
+  @override
+  String get name => 'facebookIdp';
+
+  @override
+  Future<AuthSuccess> login({
+    required String accessToken,
+  }) => Future.value(_mockData.authSuccess);
+}
+
 class Modules {
   Modules(Client client) {
     auth = Caller(client);
@@ -184,6 +198,7 @@ class Client extends ServerpodClientShared {
     googleIdp = GoogleIdpEndpoint(this);
     appleIdp = AppleIdpEndpoint(this);
     githubIdp = GitHubIdpEndpoint(this);
+    facebookIdp = FacebookIdpEndpoint(this);
     modules = Modules(this);
   }
 
@@ -195,6 +210,8 @@ class Client extends ServerpodClientShared {
 
   late final GitHubIdpEndpoint githubIdp;
 
+  late final FacebookIdpEndpoint facebookIdp;
+
   late final Modules modules;
 
   @override
@@ -203,6 +220,7 @@ class Client extends ServerpodClientShared {
     'googleIdp': googleIdp,
     'appleIdp': appleIdp,
     'githubIdp': githubIdp,
+    'facebookIdp': facebookIdp,
   };
 
   @override

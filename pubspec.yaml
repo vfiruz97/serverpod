@@ -13,3 +13,4 @@ serverpod_cli:
       - google_sign_in
       - sign_in_with_apple
       - flutter_web_auth_2
+      - flutter_facebook_auth
