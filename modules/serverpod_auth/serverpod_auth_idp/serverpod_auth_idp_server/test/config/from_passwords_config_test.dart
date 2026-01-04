@@ -4,6 +4,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/apple.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
+import 'package:serverpod_auth_idp_server/providers/facebook.dart';
 import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_auth_idp_server/providers/passkey.dart';
 import 'package:serverpod_auth_idp_server/serverpod_auth_idp_server.dart';
@@ -108,6 +109,22 @@ void main() {
               (final e) => e.key,
               'key',
               'passkeyHostname',
+            ),
+          ),
+        );
+      },
+    );
+
+    test(
+      'when constructing FacebookIdpConfigFromPasswords then throws PasswordNotFoundException.',
+      () {
+        expect(
+          () => FacebookIdpConfigFromPasswords(),
+          throwsA(
+            isA<PasswordNotFoundException>().having(
+              (final e) => e.key,
+              'key',
+              'facebookAppId',
             ),
           ),
         );
@@ -288,6 +305,49 @@ test:
         () {
           final config = PasskeyIdpConfigFromPasswords();
           expect(config, isA<PasskeyIdpConfig>());
+        },
+      );
+    },
+  );
+
+  group(
+    'Given Facebook passwords are present',
+    tags: TestTags.concurrencyOneTestTags,
+    () {
+      late Directory originalDir;
+
+      setUpAll(() async {
+        originalDir = Directory.current;
+        await d.dir('config', [
+          d.file(
+            'passwords.yaml',
+            '''
+test:
+  database: 'test'
+  facebookAppId: '123456789012345'
+  facebookAppSecret: 'abc123def456ghi789jkl012mno345pqr'
+''',
+          ),
+        ]).create();
+        Directory.current = d.sandbox;
+
+        Serverpod(
+          ['-m', 'test'],
+          Protocol(),
+          Endpoints(),
+          config: ServerpodConfig(apiServer: portZeroConfig),
+        );
+
+        addTearDown(() async {
+          Directory.current = originalDir;
+        });
+      });
+
+      test(
+        'when constructing FacebookIdpConfigFromPasswords then succeeds.',
+        () {
+          final config = FacebookIdpConfigFromPasswords();
+          expect(config, isA<FacebookIdpConfig>());
         },
       );
     },

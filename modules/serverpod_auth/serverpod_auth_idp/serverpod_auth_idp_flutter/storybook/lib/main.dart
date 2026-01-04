@@ -5,6 +5,7 @@ import 'package:storybook_toolkit/storybook_toolkit.dart';
 
 import 'stories/apple.dart';
 import 'stories/email.dart';
+import 'stories/facebook.dart';
 import 'stories/google.dart';
 import 'stories/signin.dart';
 import 'utils/client.dart';
@@ -17,6 +18,7 @@ void main() {
   client.auth.initialize();
   client.auth.initializeGoogleSignIn();
   client.auth.initializeAppleSignIn();
+  client.auth.initializeFacebookSignIn();
 
   runApp(const MainApp());
 }
@@ -44,6 +46,7 @@ class MainApp extends StatelessWidget {
         stories: [
           ...emailStories,
           ...googleStories,
+          ...facebookStories,
           ...appleStories,
           ...signInStories,
         ],

@@ -1,5 +1,5 @@
-import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart';
 import 'package:serverpod_auth_core_flutter/serverpod_auth_core_flutter.dart';
+import 'package:serverpod_auth_idp_client/serverpod_auth_idp_client.dart';
 
 /// Exposes information about available identity providers.
 class AvailableIdps {
@@ -24,8 +24,13 @@ class AvailableIdps {
   bool get hasAny => count > 0;
 
   /// The number of available identity providers.
-  int get count =>
-      [hasEmail, hasGoogle, hasApple, hasFirebase].where((e) => e).length;
+  int get count => [
+    hasEmail,
+    hasGoogle,
+    hasApple,
+    hasFirebase,
+    hasFacebook,
+  ].where((e) => e).length;
 
   /// Whether the email authentication provider is available.
   bool get hasEmail => _isProviderAvailable<EndpointEmailIdpBase>();
@@ -38,6 +43,9 @@ class AvailableIdps {
 
   /// Whether the Firebase authentication provider is available.
   bool get hasFirebase => _isProviderAvailable<EndpointFirebaseIdpBase>();
+
+  /// Whether the Facebook authentication provider is available.
+  bool get hasFacebook => _isProviderAvailable<EndpointFacebookIdpBase>();
 }
 
 /// Extension to provide information about available identity providers.
