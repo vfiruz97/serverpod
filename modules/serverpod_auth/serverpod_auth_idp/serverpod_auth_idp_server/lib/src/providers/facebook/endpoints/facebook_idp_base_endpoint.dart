@@ -8,10 +8,6 @@ import '../business/facebook_idp.dart';
 /// This endpoint exposes methods for logging in users using Facebook access tokens.
 /// If you would like modify the authentication flow, consider extending this
 /// class and overriding the relevant methods.
-///
-/// To expose these endpoint methods on your server, extend this class in a
-/// concrete class.
-/// For further details see https://docs.serverpod.dev/concepts/working-with-endpoints#inheriting-from-an-endpoint-class-marked-abstract
 abstract class FacebookIdpBaseEndpoint extends Endpoint {
   /// Accessor for the configured Facebook Idp instance.
   /// By default this uses the global instance configured in
@@ -28,15 +24,7 @@ abstract class FacebookIdpBaseEndpoint extends Endpoint {
   ///
   /// The access token is verified using Facebook's Debug Token API to ensure
   /// it's valid and belongs to the correct app.
-  ///
-  /// **Parameters:**
-  /// - [accessToken]: The Facebook user access token obtained from the client
-  ///
-  /// **Returns:**
-  /// - [AuthSuccess] containing the authentication tokens and user information
-  ///
-  /// **Throws:**
-  /// - [FacebookIdTokenVerificationException] if the token is invalid or expired
+  /// If the token is invalid or expired, the [FacebookIdTokenVerificationException] will be thrown.
   /// {@endtemplate}
   Future<AuthSuccess> login(
     final Session session, {

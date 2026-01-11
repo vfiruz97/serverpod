@@ -25,8 +25,10 @@ void main() {
         authUsers = const AuthUsers();
 
         const config = FacebookIdpConfig(
-          appId: 'test-app-id',
-          appSecret: 'test-app-secret',
+          clientCredentials: FacebookClientCredentials(
+            appId: 'test-app-id',
+            appSecret: 'test-app-secret',
+          ),
         );
 
         utils = FacebookIdpUtils(
@@ -92,7 +94,6 @@ void main() {
             session,
             authUserId: authUser.id,
             accountDetails: accountDetails,
-            accessToken: 'test-access-token',
           );
 
           expect(facebookAccount.authUserId, equals(authUser.id));
@@ -137,14 +138,12 @@ void main() {
             session,
             authUserId: authUser1.id,
             accountDetails: accountDetails1,
-            accessToken: 'token-1',
           );
 
           await admin.linkFacebookAuthentication(
             session,
             authUserId: authUser2.id,
             accountDetails: accountDetails2,
-            accessToken: 'token-2',
           );
 
           final accounts = await FacebookAccount.db.find(session);

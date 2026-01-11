@@ -4,8 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:serverpod_auth_core_flutter/serverpod_auth_core_flutter.dart';
 
-/// Service to manage Facebook Sign-In and ensure it is only initialized once
-/// throughout the app lifetime.
+/// Service to manage Facebook Sign-In and and ensure it is initialized.
 class FacebookSignInService {
   /// Singleton instance of the [FacebookSignInService].
   static final FacebookSignInService instance =
@@ -24,30 +23,25 @@ class FacebookSignInService {
   /// This method is idempotent and can be called multiple times for the same
   /// client. Multiple clients can be registered by calling this method multiple
   /// times with different clients. However, note that only the first call will
-  /// initialize the Facebook Sign-In.
+  /// initialize the Facebook Sign-In SDK.
   ///
   /// The [auth] is used to register a sign-out hook to logout from Facebook
   /// when the user signs out from the app. This prevents the user from being
   /// signed in back automatically, which would undo the signing out.
   ///
+  /// **Important**: [FacebookAuth] is a singleton, meaning there is only one
+  /// Facebook session across your entire app. If multiple auth managers are
+  /// initialized, they will all share the same Facebook authentication state.
+  ///
   /// For web and macOS platforms, the [appId] is required for initialization.
-  /// If not provided, it will try to load from the `FACEBOOK_APP_ID` environment
-  /// variable. For Android and iOS platforms, configuration is done through
-  /// native files and this parameter is ignored.
+  /// If not provided, will try to load from the `FACEBOOK_APP_ID` environment
+  /// variable. If the value is not provided by any means, an error will be
+  /// thrown during initialization. For Android and iOS, configuration is done
+  /// through native files and this parameter is ignored.
   ///
-  /// The optional [cookie], [xfbml], and [version] parameters are only used for
-  /// web and macOS platforms and will be passed to the Facebook JavaScript SDK.
-  ///
-  /// Platform-specific configuration requirements:
-  /// - Android: Configure Facebook App ID in AndroidManifest.xml and strings.xml
-  /// - iOS: Configure Facebook App ID in Info.plist
-  /// - Web: Requires [appId] parameter or FACEBOOK_APP_ID environment variable
-  /// - macOS: Requires [appId] parameter or FACEBOOK_APP_ID environment variable,
-  ///   plus additional keychain and network permissions in Info.plist
-  ///
-  /// References:
-  /// - Web setup: https://facebook.meedu.app/docs/7.x.x/web
-  /// - macOS setup: https://facebook.meedu.app/docs/7.x.x/macos
+  /// The optional [cookie], [xfbml], and [version] parameters are used only for
+  /// web and macOS platforms. See [FacebookAuth.webAndDesktopInitialize] for
+  /// more details.
   Future<FacebookAuth> ensureInitialized({
     required FlutterAuthSessionManager auth,
     String? appId,
@@ -60,8 +54,9 @@ class FacebookSignInService {
     }
 
     await _withMutexOneTimeInit(() async {
-      // Web and macOS platforms require explicit initialization
       if (kIsWeb || defaultTargetPlatform == TargetPlatform.macOS) {
+        if (facebookAuth.isWebSdkInitialized) return;
+
         appId ??= _getAppIdFromEnvVar();
 
         if (appId == null) {
@@ -79,8 +74,6 @@ class FacebookSignInService {
           version: version,
         );
       }
-
-      // For Android and iOS, SDK initialization happens automatically via platform channels
     });
 
     _initializeClient(auth);
@@ -92,8 +85,9 @@ class FacebookSignInService {
       if (!auth.isAuthenticated) {
         unawaited(
           facebookAuth.logOut().onError(
-            (e, _) =>
-                debugPrint('Failed to sign out from Facebook: ${e.toString()}'),
+            (e, _) => debugPrint(
+              'Failed to sign out from Facebook: ${e.toString()}',
+            ),
           ),
         );
       }
@@ -128,68 +122,31 @@ class FacebookSignInService {
   /// Signs in with Facebook and returns the access token.
   ///
   /// Requests the specified [permissions] from Facebook. By default, requests
-  /// 'public_profile' and 'email' permissions.
+  /// `public_profile` and `email` permissions.
   ///
   /// Returns the access token if sign-in is successful, or null if the user
-  /// cancels or an error occurs.
+  /// cancels the login.
   ///
-  /// Reference: https://facebook.meedu.app/docs/7.x.x/usage
+  /// Throws an exception if the login fails for any other reason.
   Future<String?> signIn({
     List<String> permissions = const ['public_profile', 'email'],
   }) async {
-    try {
-      final LoginResult result = await facebookAuth.login(
-        permissions: permissions,
-      );
+    final LoginResult result = await facebookAuth.login(
+      permissions: permissions,
+    );
 
-      if (result.status == LoginStatus.success) {
-        return result.accessToken?.tokenString;
-      } else if (result.status == LoginStatus.cancelled) {
-        // User cancelled the login
-        return null;
-      } else {
-        // Login failed
-        throw Exception('Facebook login failed: ${result.message}');
-      }
-    } catch (e) {
-      rethrow;
+    if (result.status == LoginStatus.success) {
+      return result.accessToken?.tokenString;
+    } else if (result.status == LoginStatus.cancelled) {
+      return null;
+    } else {
+      throw Exception('Facebook login failed: ${result.message}');
     }
   }
 
-  /// Signs out from Facebook.
-  ///
-  /// This clears the Facebook session and any cached credentials.
+  /// Signs out from Facebook and clears the session.
   Future<void> signOut() async {
     await facebookAuth.logOut();
-  }
-
-  /// Gets the current access token if the user is already logged in.
-  ///
-  /// Returns null if no valid access token exists.
-  Future<String?> getCurrentAccessToken() async {
-    final AccessToken? accessToken = await facebookAuth.accessToken;
-    return accessToken?.tokenString;
-  }
-
-  /// Checks if the user is currently logged in to Facebook.
-  Future<bool> isLoggedIn() async {
-    final accessToken = await getCurrentAccessToken();
-    return accessToken != null;
-  }
-
-  /// Checks if the Facebook Web SDK was successfully initialized.
-  ///
-  /// This is only relevant for web and macOS platforms. Returns true on
-  /// Android and iOS platforms.
-  ///
-  /// On web, the SDK initialization can fail due to missing configuration or
-  /// content blockers. You can use this method to check if initialization
-  /// succeeded before attempting to use Facebook authentication.
-  Future<bool> isWebSdkInitialized() async {
-    if (!kIsWeb && defaultTargetPlatform != TargetPlatform.macOS) {
-      return true;
-    }
-    return facebookAuth.isWebSdkInitialized;
   }
 }
 
@@ -199,25 +156,19 @@ extension FacebookSignInExtension on FlutterAuthSessionManager {
   ///
   /// This method is idempotent and can be called multiple times and from
   /// multiple clients. However, note that only the first call will initialize
-  /// the Facebook Sign-In.
+  /// the Facebook Sign-In SDK.
   ///
   /// Upon initialization, a sign-out hook is registered to sign out from Facebook
   /// when the user signs out from the app. This prevents the user from being
   /// signed in back automatically, which would undo the signing out.
   ///
-  /// For web and macOS platforms, the [appId] is required for initialization.
-  /// If not provided, it will try to load from the `FACEBOOK_APP_ID` environment
-  /// variable. For Android and iOS platforms, configuration is done through
-  /// native files and this parameter is ignored.
+  /// For web and macOS platforms, the [appId] is required. If not provided, will
+  /// try to load from the `FACEBOOK_APP_ID` environment variable. For Android and
+  /// iOS, configuration is done through native files and this parameter is ignored.
   ///
-  /// The optional [cookie], [xfbml], and [version] parameters are only used for
-  /// web and macOS platforms and will be passed to the Facebook JavaScript SDK.
-  ///
-  /// Platform-specific setup guides:
-  /// - Android: https://facebook.meedu.app/docs/7.x.x/android
-  /// - iOS: https://facebook.meedu.app/docs/7.x.x/ios
-  /// - Web: https://facebook.meedu.app/docs/7.x.x/web
-  /// - macOS: https://facebook.meedu.app/docs/7.x.x/macos
+  /// The optional [cookie], [xfbml], and [version] parameters are used only for
+  /// web and macOS platforms. See [FacebookAuth.webAndDesktopInitialize] for
+  /// more details.
   Future<void> initializeFacebookSignIn({
     String? appId,
     bool cookie = true,
@@ -233,20 +184,24 @@ extension FacebookSignInExtension on FlutterAuthSessionManager {
     );
   }
 
-  /// Completely disconnects the user's Facebook account from your app and revokes
-  /// all previous authorizations. This removes the app's access permissions
-  /// entirely, meaning the user will need to go through the full authorization
-  /// flow again on the next sign-in, including the account picker and consent
-  /// screens.
-  Future<void> disconnectFacebookAccount() async {
+  /// Signs out from the singleton Facebook session and from the current device.
+  ///
+  /// **Important**: Since [FacebookAuth] is a singleton, signing out will clear
+  /// the Facebook session for the entire app. Any subsequent sign-in attempts,
+  /// even from other auth managers, will require the user to go through the
+  /// full authorization flow again.
+  ///
+  /// This method:
+  /// 1. Signs out from the Facebook SDK (affects all parts of the app)
+  /// 2. Signs out the current device from Serverpod
+  Future<void> signOutFacebookAccount() async {
     final signIn = await FacebookSignInService.instance.ensureInitialized(
       auth: this,
     );
     await signIn.logOut();
 
-    // NOTE: This delay prevents the Facebook Sign-In button from rendering
-    // before the disconnect process is complete. Without this, the Sign-In
-    // screen will render the button still showing the user as signed in.
+    // Delay prevents rendering issues where the button may still show the
+    // user as signed in before the sign-out process completes.
     await Future.delayed(const Duration(milliseconds: 300));
     await signOutDevice();
   }

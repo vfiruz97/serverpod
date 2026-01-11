@@ -30,8 +30,6 @@ import 'facebook_sign_in_service.dart';
 ///   // Can use `controller.state` to access the current state.
 /// });
 /// ```
-///
-/// Reference: https://developers.facebook.com/docs/facebook-login/
 class FacebookAuthController extends ChangeNotifier {
   /// The Serverpod client instance.
   final ServerpodClientShared client;
@@ -69,7 +67,7 @@ class FacebookAuthController extends ChangeNotifier {
   /// - `public_profile`: Access to user's ID, name, and profile picture
   /// - `email`: Access to user's email address
   ///
-  /// Reference: https://developers.facebook.com/docs/permissions/reference
+  /// Requests access to user email and read-only profile information.
   static const defaultPermissions = [
     'public_profile',
     'email',
@@ -77,7 +75,6 @@ class FacebookAuthController extends ChangeNotifier {
 
   FacebookAuthState _state = FacebookAuthState.initializing;
 
-  bool _isInitialized = false;
   bool _disposed = false;
 
   /// The current state of the authentication flow.
@@ -88,9 +85,6 @@ class FacebookAuthController extends ChangeNotifier {
 
   /// Whether the user is authenticated.
   bool get isAuthenticated => client.auth.isAuthenticated;
-
-  /// Whether the controller has been initialized.
-  bool get isInitialized => _isInitialized;
 
   /// The current error message, if any.
   String? get errorMessage => _error?.toString();
@@ -108,8 +102,9 @@ class FacebookAuthController extends ChangeNotifier {
   /// Initializes the Facebook Sign-In service.
   Future<void> _initialize() async {
     try {
-      await FacebookSignInService.instance.ensureInitialized(auth: client.auth);
-      _isInitialized = true;
+      await FacebookSignInService.instance.ensureInitialized(
+        auth: client.auth,
+      );
       _setState(FacebookAuthState.idle);
     } catch (error) {
       _error = error;
@@ -125,13 +120,8 @@ class FacebookAuthController extends ChangeNotifier {
   ///
   /// If the user cancels the sign-in, the state returns to idle without
   /// triggering an error.
-  ///
-  /// Reference: https://facebook.meedu.app/docs/7.x.x/usage
   Future<void> signIn() async {
-    if (!_isInitialized) {
-      throw StateError('FacebookAuthController is not initialized yet');
-    }
-
+    if (_state == FacebookAuthState.loading) return;
     _setState(FacebookAuthState.loading);
 
     try {

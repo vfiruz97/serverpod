@@ -16,12 +16,7 @@ import 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     as _i2;
 import 'package:serverpod_auth_idp_server/src/generated/protocol.dart' as _i3;
 
-/// A fully configured Facebook account to be used for logins.
-///
-/// This account stores the user's Facebook profile information and access token
-/// for authentication purposes.
-///
-/// Reference: https://developers.facebook.com/docs/graph-api/reference/user
+/// A fully configured Facebook account to be used for logins.\
 abstract class FacebookAccount
     implements _i1.TableRow<_i1.UuidValue?>, _i1.ProtocolSerialization {
   FacebookAccount._({
@@ -88,9 +83,6 @@ abstract class FacebookAccount
   DateTime createdAt;
 
   /// The Facebook-provided user identifier (Facebook User ID).
-  ///
-  /// This is the unique identifier for the user on Facebook's platform.
-  /// Reference: https://developers.facebook.com/docs/graph-api/reference/user#fields
   String userIdentifier;
 
   /// The verified email of the user, as received from Facebook.
@@ -326,9 +318,6 @@ class FacebookAccountTable extends _i1.Table<_i1.UuidValue?> {
   late final _i1.ColumnDateTime createdAt;
 
   /// The Facebook-provided user identifier (Facebook User ID).
-  ///
-  /// This is the unique identifier for the user on Facebook's platform.
-  /// Reference: https://developers.facebook.com/docs/graph-api/reference/user#fields
   late final _i1.ColumnString userIdentifier;
 
   /// The verified email of the user, as received from Facebook.

@@ -1,9 +1,4 @@
-### A fully configured Facebook account to be used for logins.
-###
-### This account stores the user's Facebook profile information and access token
-### for authentication purposes.
-###
-### Reference: https://developers.facebook.com/docs/graph-api/reference/user
+### A fully configured Facebook account to be used for logins.\
 class: FacebookAccount
 serverOnly: true
 table: serverpod_auth_idp_facebook_account
@@ -17,9 +12,6 @@ fields:
   createdAt: DateTime, defaultModel=now
 
   ### The Facebook-provided user identifier (Facebook User ID).
-  ###
-  ### This is the unique identifier for the user on Facebook's platform.
-  ### Reference: https://developers.facebook.com/docs/graph-api/reference/user#fields
   userIdentifier: String
 
   ### The verified email of the user, as received from Facebook.

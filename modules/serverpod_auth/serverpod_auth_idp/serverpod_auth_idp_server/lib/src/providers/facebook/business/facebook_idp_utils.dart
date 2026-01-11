@@ -109,17 +109,6 @@ class FacebookIdpUtils {
         session,
         authUserId: authUser.id,
         accountDetails: accountDetails,
-        accessToken: accessToken,
-        transaction: transaction,
-      );
-    }
-
-    // Execute custom callback if provided
-    if (config.getExtraFacebookInfoCallback != null) {
-      await config.getExtraFacebookInfoCallback!(
-        session,
-        accountDetails: accountDetails,
-        accessToken: accessToken,
         transaction: transaction,
       );
     }
@@ -138,12 +127,12 @@ class FacebookIdpUtils {
   /// This method first verifies the token using Facebook's Debug Token API,
   /// then fetches the user's profile information from the Graph API.
   ///
-  /// Reference: https://developers.facebook.com/docs/graph-api/reference/user
+  /// Throws [FacebookIdTokenVerificationException] if the user info retrieval fails.
   Future<FacebookAccountDetails> fetchAccountDetails(
     final Session session, {
     required final String accessToken,
   }) async {
-    // First, verify the access token
+    // Verify the facebook access token
     await _verifyAccessToken(session, accessToken: accessToken);
 
     // Fetch user profile data from Graph API
@@ -159,36 +148,51 @@ class FacebookIdpUtils {
     );
 
     if (response.statusCode != 200) {
-      session.log(
+      session.logAndThrow(
         'Failed to fetch Facebook user data: ${response.statusCode} ${response.body}',
-        level: LogLevel.error,
       );
-      throw FacebookIdTokenVerificationException();
     }
 
     final Map<String, dynamic> data;
     try {
       data = json.decode(response.body) as Map<String, dynamic>;
-    } catch (e, stackTrace) {
-      session.log(
-        'Failed to parse Facebook user data response',
-        level: LogLevel.error,
-        exception: e,
-        stackTrace: stackTrace,
+    } catch (e) {
+      session.logAndThrow(
+        'Failed to parse Facebook user data response: $e',
       );
-      throw FacebookIdTokenVerificationException();
     }
 
+    FacebookAccountDetails details;
+    try {
+      details = _parseAccountDetails(data);
+    } catch (e) {
+      session.logAndThrow('Invalid user info from Facebook: $e');
+    }
+
+    try {
+      final getExtraInfoCallback = config.getExtraFacebookInfoCallback;
+      if (getExtraInfoCallback != null) {
+        await getExtraInfoCallback(
+          session,
+          accountDetails: details,
+          accessToken: accessToken,
+          transaction: null,
+        );
+      }
+    } catch (e) {
+      session.logAndThrow('Failed to get extra Facebook account info: $e');
+    }
+
+    return details;
+  }
+
+  FacebookAccountDetails _parseAccountDetails(final Map<String, dynamic> data) {
     final userIdentifier = data['id'] as String?;
     if (userIdentifier == null) {
-      session.log(
-        'Facebook user ID not found in response',
-        level: LogLevel.error,
-      );
-      throw FacebookIdTokenVerificationException();
+      throw FacebookUserInfoMissingDataException();
     }
 
-    final accountDetails = (
+    final details = (
       userIdentifier: userIdentifier,
       email: (data['email'] as String?)?.toLowerCase(),
       fullName: data['name'] as String?,
@@ -197,21 +201,23 @@ class FacebookIdpUtils {
       image: _extractProfilePictureUrl(data),
     );
 
-    // Validate account details
-    config.facebookAccountDetailsValidation(accountDetails);
+    try {
+      config.facebookAccountDetailsValidation(details);
+    } catch (e) {
+      throw FacebookUserInfoMissingDataException();
+    }
 
-    return accountDetails;
+    return details;
   }
 
   /// Verifies a Facebook access token using the Debug Token API.
-  ///
-  /// Reference: https://developers.facebook.com/docs/graph-api/reference/debug_token
   Future<void> _verifyAccessToken(
     final Session session, {
     required final String accessToken,
   }) async {
     // Get app access token for verification
-    final appAccessToken = '${config.appId}|${config.appSecret}';
+    final appAccessToken =
+        '${config.clientCredentials.appId}|${config.clientCredentials.appSecret}';
 
     final response = await http.get(
       Uri.https(
@@ -225,52 +231,36 @@ class FacebookIdpUtils {
     );
 
     if (response.statusCode != 200) {
-      session.log(
+      session.logAndThrow(
         'Failed to verify Facebook access token: ${response.statusCode}',
-        level: LogLevel.error,
       );
-      throw FacebookIdTokenVerificationException();
     }
 
     final Map<String, dynamic> responseData;
     try {
       responseData = json.decode(response.body) as Map<String, dynamic>;
-    } catch (e, stackTrace) {
-      session.log(
-        'Failed to parse Facebook token verification response',
-        level: LogLevel.error,
-        exception: e,
-        stackTrace: stackTrace,
+    } catch (e) {
+      session.logAndThrow(
+        'Failed to parse Facebook token verification response: $e',
       );
-      throw FacebookIdTokenVerificationException();
     }
 
     final data = responseData['data'] as Map<String, dynamic>?;
     if (data == null) {
-      session.log(
+      session.logAndThrow(
         'Invalid Facebook token verification response format',
-        level: LogLevel.error,
       );
-      throw FacebookIdTokenVerificationException();
     }
 
     final isValid = data['is_valid'] as bool? ?? false;
     if (!isValid) {
-      session.log(
-        'Facebook access token is not valid',
-        level: LogLevel.warning,
-      );
-      throw FacebookIdTokenVerificationException();
+      session.logAndThrow('Facebook access token is not valid');
     }
 
     // Verify the token is for the correct app
     final appId = data['app_id'] as String?;
-    if (appId != config.appId) {
-      session.log(
-        'Facebook access token is for a different app',
-        level: LogLevel.warning,
-      );
-      throw FacebookIdTokenVerificationException();
+    if (appId != config.clientCredentials.appId) {
+      session.logAndThrow('Facebook access token is for a different app');
     }
 
     // Check if token is expired
@@ -280,18 +270,12 @@ class FacebookIdpUtils {
         expiresAt * 1000,
       );
       if (DateTime.now().isAfter(expirationDate)) {
-        session.log(
-          'Facebook access token has expired',
-          level: LogLevel.warning,
-        );
-        throw FacebookIdTokenVerificationException();
+        session.logAndThrow('Facebook access token has expired');
       }
     }
   }
 
   /// Extracts the profile picture URL from Facebook user data.
-  ///
-  /// Reference: https://developers.facebook.com/docs/graph-api/reference/user/picture
   Uri? _extractProfilePictureUrl(final Map<String, dynamic> data) {
     final picture = data['picture'] as Map<String, dynamic>?;
     if (picture == null) return null;
@@ -312,7 +296,6 @@ class FacebookIdpUtils {
     final Session session, {
     required final UuidValue authUserId,
     required final FacebookAccountDetails accountDetails,
-    required final String accessToken,
     required final Transaction? transaction,
   }) async {
     final facebookAccount = FacebookAccount(
@@ -329,5 +312,12 @@ class FacebookIdpUtils {
       facebookAccount,
       transaction: transaction,
     );
+  }
+}
+
+extension on Session {
+  Never logAndThrow(final String message) {
+    log(message, level: LogLevel.debug);
+    throw FacebookIdTokenVerificationException();
   }
 }

@@ -4,9 +4,6 @@ import '../../../generated/protocol.dart';
 import 'facebook_idp_utils.dart';
 
 /// Collection of Facebook-account admin methods.
-///
-/// These methods can be used to manage Facebook accounts and perform
-/// administrative operations.
 class FacebookIdpAdmin {
   /// Utility functions for the Facebook identity provider.
   final FacebookIdpUtils utils;
@@ -18,8 +15,6 @@ class FacebookIdpAdmin {
   ///
   /// This method verifies the token and fetches the user's profile information
   /// from Facebook's Graph API.
-  ///
-  /// Reference: https://developers.facebook.com/docs/graph-api/reference/user
   Future<FacebookAccountDetails> fetchAccountDetails(
     final Session session, {
     required final String accessToken,
@@ -37,14 +32,12 @@ class FacebookIdpAdmin {
     final Session session, {
     required final UuidValue authUserId,
     required final FacebookAccountDetails accountDetails,
-    required final String accessToken,
     final Transaction? transaction,
   }) async {
     return utils.linkFacebookAuthentication(
       session,
       authUserId: authUserId,
       accountDetails: accountDetails,
-      accessToken: accessToken,
       transaction: transaction,
     );
   }
@@ -60,6 +53,7 @@ class FacebookIdpAdmin {
       where: (final t) => t.userIdentifier.equals(userIdentifier),
       transaction: transaction,
     );
+
     return account?.authUserId;
   }
 }

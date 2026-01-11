@@ -180,10 +180,6 @@ abstract class EndpointEmailIdpBase extends _i1.EndpointRef {
 /// This endpoint exposes methods for logging in users using Facebook access tokens.
 /// If you would like modify the authentication flow, consider extending this
 /// class and overriding the relevant methods.
-///
-/// To expose these endpoint methods on your server, extend this class in a
-/// concrete class.
-/// For further details see https://docs.serverpod.dev/concepts/working-with-endpoints#inheriting-from-an-endpoint-class-marked-abstract
 /// {@category Endpoint}
 abstract class EndpointFacebookIdpBase extends _i1.EndpointRef {
   EndpointFacebookIdpBase(_i1.EndpointCaller caller) : super(caller);
@@ -195,15 +191,7 @@ abstract class EndpointFacebookIdpBase extends _i1.EndpointRef {
   ///
   /// The access token is verified using Facebook's Debug Token API to ensure
   /// it's valid and belongs to the correct app.
-  ///
-  /// **Parameters:**
-  /// - [accessToken]: The Facebook user access token obtained from the client
-  ///
-  /// **Returns:**
-  /// - [AuthSuccess] containing the authentication tokens and user information
-  ///
-  /// **Throws:**
-  /// - [FacebookIdTokenVerificationException] if the token is invalid or expired
+  /// If the token is invalid or expired, the [FacebookIdTokenVerificationException] will be thrown.
   _i2.Future<_i3.AuthSuccess> login({required String accessToken});
 }
 

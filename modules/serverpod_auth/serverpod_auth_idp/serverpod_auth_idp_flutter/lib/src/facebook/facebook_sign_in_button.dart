@@ -6,8 +6,6 @@ import 'facebook_sign_in_style.dart';
 ///
 /// This widget creates a custom Facebook Sign-In button following Facebook's
 /// brand guidelines and adds loading and disabled states.
-///
-/// Reference: https://developers.facebook.com/docs/facebook-login/userexperience/
 class FacebookSignInButton extends StatelessWidget {
   /// Callback when the button is pressed.
   final VoidCallback? onPressed;
@@ -114,7 +112,7 @@ class FacebookSignInButton extends StatelessWidget {
   Widget _buildButtonContent(FacebookSignInStyle buttonStyle) {
     final logo = Icon(
       Icons.facebook,
-      size: buttonStyle.size.height * 0.5,
+      size: buttonStyle.size.height * 0.6,
       color: buttonStyle.textColor,
     );
 

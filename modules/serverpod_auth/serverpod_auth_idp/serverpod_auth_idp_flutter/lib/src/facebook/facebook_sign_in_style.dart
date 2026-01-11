@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart' hide IconAlignment;
 
 /// The style of Facebook Sign-In button.
-///
-/// Facebook provides official brand guidelines for their login button:
-/// https://developers.facebook.com/docs/facebook-login/userexperience/
 enum FacebookButtonStyle {
   /// Facebook blue button (default).
   blue,
@@ -85,8 +82,6 @@ class FacebookSignInStyle {
   ///
   /// Values are translated from the enum values to actual style properties
   /// matching Facebook brand guidelines.
-  ///
-  /// Reference: https://developers.facebook.com/docs/facebook-login/userexperience/
   factory FacebookSignInStyle.fromConfiguration({
     required FacebookButtonShape shape,
     required FacebookButtonSize size,

@@ -2,6 +2,7 @@ import 'package:serverpod/serverpod.dart';
 import 'package:serverpod_auth_idp_server/core.dart';
 import 'package:serverpod_auth_idp_server/providers/apple.dart';
 import 'package:serverpod_auth_idp_server/providers/email.dart';
+import 'package:serverpod_auth_idp_server/providers/facebook.dart';
 import 'package:serverpod_auth_idp_server/providers/github.dart';
 import 'package:serverpod_auth_idp_server/providers/google.dart';
 import 'package:serverpod_auth_idp_server/providers/passkey.dart';
@@ -71,6 +72,13 @@ void run(List<String> args) async {
     hostname: 'localhost',
   );
 
+  final facebookIdpConfig = FacebookIdpConfig(
+    clientCredentials: FacebookClientCredentials(
+      appId: pod.getPassword('facebookAppId')!,
+      appSecret: pod.getPassword('facebookAppSecret')!,
+    ),
+  );
+
   pod.initializeAuthServices(
     tokenManagerBuilders: [
       serverSideSessionsConfig,
@@ -82,6 +90,7 @@ void run(List<String> args) async {
       appleIdpConfig,
       emailIdpConfig,
       passkeyIdpConfig,
+      facebookIdpConfig,
     ],
   );
 

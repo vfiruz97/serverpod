@@ -66,30 +66,7 @@ class FacebookIdp {
     );
   }
 
-  /// {@template facebook_idp_base_endpoint.login}
-  /// Validates a Facebook access token and either logs in the associated user or
-  /// creates a new user account if the Facebook account ID is not yet known.
-  ///
-  /// If a new user is created, an associated [UserProfile] is also created with
-  /// the user's name and email (if provided).
-  ///
-  /// The access token is verified using Facebook's Debug Token API to ensure
-  /// it's valid and belongs to the correct app.
-  ///
-  /// **Parameters:**
-  /// - [accessToken]: The Facebook user access token obtained from the client
-  ///
-  /// **Returns:**
-  /// - [AuthSuccess] containing the authentication tokens and user information
-  ///
-  /// **Throws:**
-  /// - [FacebookIdTokenVerificationException] if the token is invalid or expired
-  ///
-  /// **References:**
-  /// - Facebook Login: https://developers.facebook.com/docs/facebook-login/
-  /// - Access Tokens: https://developers.facebook.com/docs/facebook-login/guides/access-tokens
-  /// - Debug Token API: https://developers.facebook.com/docs/graph-api/reference/debug_token
-  /// {@endtemplate}
+  /// {@macro facebook_idp_base_endpoint.login}
   Future<AuthSuccess> login(
     final Session session, {
     required final String accessToken,

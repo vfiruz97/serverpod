@@ -48,9 +48,9 @@ class MainApp extends StatelessWidget {
         stories: [
           ...emailStories,
           ...googleStories,
-          ...facebookStories,
           ...appleStories,
           ...githubStories,
+          ...facebookStories,
           ...signInStories,
         ],
       ),
