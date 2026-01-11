@@ -191,7 +191,7 @@ abstract class EndpointFacebookIdpBase extends _i1.EndpointRef {
   ///
   /// The access token is verified using Facebook's Debug Token API to ensure
   /// it's valid and belongs to the correct app.
-  /// If the token is invalid or expired, the [FacebookIdTokenVerificationException] will be thrown.
+  /// If the token is invalid or expired, the [FacebookAccessTokenVerificationException] will be thrown.
   _i2.Future<_i3.AuthSuccess> login({required String accessToken});
 }
 

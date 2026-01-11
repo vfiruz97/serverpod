@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:serverpod_auth_core_flutter/serverpod_auth_core_flutter.dart';
 
-/// Service to manage Facebook Sign-In and and ensure it is initialized.
+/// Service to manage Facebook Sign-In and ensure it is initialized.
 class FacebookSignInService {
   /// Singleton instance of the [FacebookSignInService].
   static final FacebookSignInService instance =

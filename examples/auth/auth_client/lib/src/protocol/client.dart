@@ -242,7 +242,7 @@ class EndpointFacebookIdp extends _i1.EndpointFacebookIdpBase {
   ///
   /// The access token is verified using Facebook's Debug Token API to ensure
   /// it's valid and belongs to the correct app.
-  /// If the token is invalid or expired, the [FacebookIdTokenVerificationException] will be thrown.
+  /// If the token is invalid or expired, the [FacebookAccessTokenVerificationException] will be thrown.
   @override
   _i3.Future<_i4.AuthSuccess> login({required String accessToken}) =>
       caller.callServerEndpoint<_i4.AuthSuccess>(

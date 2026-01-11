@@ -2,4 +2,4 @@
 ###
 ### This is a generic exception that does not expose any details regarding the
 ### cause of the failure to avoid leaking information to potential attackers.
-exception: FacebookIdTokenVerificationException
+exception: FacebookAccessTokenVerificationException

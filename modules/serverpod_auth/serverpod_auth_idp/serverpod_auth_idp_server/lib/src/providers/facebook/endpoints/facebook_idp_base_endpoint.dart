@@ -24,7 +24,7 @@ abstract class FacebookIdpBaseEndpoint extends Endpoint {
   ///
   /// The access token is verified using Facebook's Debug Token API to ensure
   /// it's valid and belongs to the correct app.
-  /// If the token is invalid or expired, the [FacebookIdTokenVerificationException] will be thrown.
+  /// If the token is invalid or expired, the [FacebookAccessTokenVerificationException] will be thrown.
   /// {@endtemplate}
   Future<AuthSuccess> login(
     final Session session, {

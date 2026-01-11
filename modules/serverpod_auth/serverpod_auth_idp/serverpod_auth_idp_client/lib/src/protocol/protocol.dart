@@ -23,7 +23,7 @@ import 'providers/email/models/exceptions/email_account_request_exception.dart'
     as _i6;
 import 'providers/email/models/exceptions/email_account_request_exception_reason.dart'
     as _i7;
-import 'providers/facebook/models/facebook_id_token_verification_exception.dart'
+import 'providers/facebook/models/facebook_access_token_verification_exception.dart'
     as _i8;
 import 'providers/firebase/models/firebase_id_token_verification_exception.dart'
     as _i9;
@@ -48,7 +48,7 @@ export 'providers/email/models/exceptions/email_account_password_reset_exception
 export 'providers/email/models/exceptions/email_account_password_reset_exception_reason.dart';
 export 'providers/email/models/exceptions/email_account_request_exception.dart';
 export 'providers/email/models/exceptions/email_account_request_exception_reason.dart';
-export 'providers/facebook/models/facebook_id_token_verification_exception.dart';
+export 'providers/facebook/models/facebook_access_token_verification_exception.dart';
 export 'providers/firebase/models/firebase_id_token_verification_exception.dart';
 export 'providers/github/models/github_access_token_verification_exception.dart';
 export 'providers/google/models/google_id_token_verification_exception.dart';
@@ -113,8 +113,8 @@ class Protocol extends _i1.SerializationManager {
     if (t == _i7.EmailAccountRequestExceptionReason) {
       return _i7.EmailAccountRequestExceptionReason.fromJson(data) as T;
     }
-    if (t == _i8.FacebookIdTokenVerificationException) {
-      return _i8.FacebookIdTokenVerificationException.fromJson(data) as T;
+    if (t == _i8.FacebookAccessTokenVerificationException) {
+      return _i8.FacebookAccessTokenVerificationException.fromJson(data) as T;
     }
     if (t == _i9.FirebaseIdTokenVerificationException) {
       return _i9.FirebaseIdTokenVerificationException.fromJson(data) as T;
@@ -176,9 +176,9 @@ class Protocol extends _i1.SerializationManager {
               : null)
           as T;
     }
-    if (t == _i1.getType<_i8.FacebookIdTokenVerificationException?>()) {
+    if (t == _i1.getType<_i8.FacebookAccessTokenVerificationException?>()) {
       return (data != null
-              ? _i8.FacebookIdTokenVerificationException.fromJson(data)
+              ? _i8.FacebookAccessTokenVerificationException.fromJson(data)
               : null)
           as T;
     }
@@ -255,8 +255,8 @@ class Protocol extends _i1.SerializationManager {
       _i6.EmailAccountRequestException => 'EmailAccountRequestException',
       _i7.EmailAccountRequestExceptionReason =>
         'EmailAccountRequestExceptionReason',
-      _i8.FacebookIdTokenVerificationException =>
-        'FacebookIdTokenVerificationException',
+      _i8.FacebookAccessTokenVerificationException =>
+        'FacebookAccessTokenVerificationException',
       _i9.FirebaseIdTokenVerificationException =>
         'FirebaseIdTokenVerificationException',
       _i10.GitHubAccessTokenVerificationException =>
@@ -300,8 +300,8 @@ class Protocol extends _i1.SerializationManager {
         return 'EmailAccountRequestException';
       case _i7.EmailAccountRequestExceptionReason():
         return 'EmailAccountRequestExceptionReason';
-      case _i8.FacebookIdTokenVerificationException():
-        return 'FacebookIdTokenVerificationException';
+      case _i8.FacebookAccessTokenVerificationException():
+        return 'FacebookAccessTokenVerificationException';
       case _i9.FirebaseIdTokenVerificationException():
         return 'FirebaseIdTokenVerificationException';
       case _i10.GitHubAccessTokenVerificationException():
@@ -352,8 +352,8 @@ class Protocol extends _i1.SerializationManager {
     if (dataClassName == 'EmailAccountRequestExceptionReason') {
       return deserialize<_i7.EmailAccountRequestExceptionReason>(data['data']);
     }
-    if (dataClassName == 'FacebookIdTokenVerificationException') {
-      return deserialize<_i8.FacebookIdTokenVerificationException>(
+    if (dataClassName == 'FacebookAccessTokenVerificationException') {
+      return deserialize<_i8.FacebookAccessTokenVerificationException>(
         data['data'],
       );
     }

@@ -16,31 +16,31 @@ import 'package:serverpod/serverpod.dart' as _i1;
 ///
 /// This is a generic exception that does not expose any details regarding the
 /// cause of the failure to avoid leaking information to potential attackers.
-abstract class FacebookIdTokenVerificationException
+abstract class FacebookAccessTokenVerificationException
     implements
         _i1.SerializableException,
         _i1.SerializableModel,
         _i1.ProtocolSerialization {
-  FacebookIdTokenVerificationException._();
+  FacebookAccessTokenVerificationException._();
 
-  factory FacebookIdTokenVerificationException() =
-      _FacebookIdTokenVerificationExceptionImpl;
+  factory FacebookAccessTokenVerificationException() =
+      _FacebookAccessTokenVerificationExceptionImpl;
 
-  factory FacebookIdTokenVerificationException.fromJson(
+  factory FacebookAccessTokenVerificationException.fromJson(
     Map<String, dynamic> jsonSerialization,
   ) {
-    return FacebookIdTokenVerificationException();
+    return FacebookAccessTokenVerificationException();
   }
 
-  /// Returns a shallow copy of this [FacebookIdTokenVerificationException]
+  /// Returns a shallow copy of this [FacebookAccessTokenVerificationException]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
-  FacebookIdTokenVerificationException copyWith();
+  FacebookAccessTokenVerificationException copyWith();
   @override
   Map<String, dynamic> toJson() {
     return {
       '__className__':
-          'serverpod_auth_idp.FacebookIdTokenVerificationException',
+          'serverpod_auth_idp.FacebookAccessTokenVerificationException',
     };
   }
 
@@ -48,25 +48,25 @@ abstract class FacebookIdTokenVerificationException
   Map<String, dynamic> toJsonForProtocol() {
     return {
       '__className__':
-          'serverpod_auth_idp.FacebookIdTokenVerificationException',
+          'serverpod_auth_idp.FacebookAccessTokenVerificationException',
     };
   }
 
   @override
   String toString() {
-    return 'FacebookIdTokenVerificationException';
+    return 'FacebookAccessTokenVerificationException';
   }
 }
 
-class _FacebookIdTokenVerificationExceptionImpl
-    extends FacebookIdTokenVerificationException {
-  _FacebookIdTokenVerificationExceptionImpl() : super._();
+class _FacebookAccessTokenVerificationExceptionImpl
+    extends FacebookAccessTokenVerificationException {
+  _FacebookAccessTokenVerificationExceptionImpl() : super._();
 
-  /// Returns a shallow copy of this [FacebookIdTokenVerificationException]
+  /// Returns a shallow copy of this [FacebookAccessTokenVerificationException]
   /// with some or all fields replaced by the given arguments.
   @_i1.useResult
   @override
-  FacebookIdTokenVerificationException copyWith() {
-    return FacebookIdTokenVerificationException();
+  FacebookAccessTokenVerificationException copyWith() {
+    return FacebookAccessTokenVerificationException();
   }
 }

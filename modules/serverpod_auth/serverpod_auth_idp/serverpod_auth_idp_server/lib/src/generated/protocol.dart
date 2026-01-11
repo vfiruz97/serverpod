@@ -34,9 +34,9 @@ import 'providers/email/models/exceptions/email_account_request_exception.dart'
     as _i14;
 import 'providers/email/models/exceptions/email_account_request_exception_reason.dart'
     as _i15;
-import 'providers/facebook/models/facebook_account.dart' as _i16;
-import 'providers/facebook/models/facebook_id_token_verification_exception.dart'
-    as _i17;
+import 'providers/facebook/models/facebook_access_token_verification_exception.dart'
+    as _i16;
+import 'providers/facebook/models/facebook_account.dart' as _i17;
 import 'providers/firebase/models/firebase_account.dart' as _i18;
 import 'providers/firebase/models/firebase_id_token_verification_exception.dart'
     as _i19;
@@ -69,8 +69,8 @@ export 'providers/email/models/exceptions/email_account_password_reset_exception
 export 'providers/email/models/exceptions/email_account_password_reset_exception_reason.dart';
 export 'providers/email/models/exceptions/email_account_request_exception.dart';
 export 'providers/email/models/exceptions/email_account_request_exception_reason.dart';
+export 'providers/facebook/models/facebook_access_token_verification_exception.dart';
 export 'providers/facebook/models/facebook_account.dart';
-export 'providers/facebook/models/facebook_id_token_verification_exception.dart';
 export 'providers/firebase/models/firebase_account.dart';
 export 'providers/firebase/models/firebase_id_token_verification_exception.dart';
 export 'providers/github/models/github_access_token_verification_exception.dart';
@@ -1165,11 +1165,11 @@ class Protocol extends _i1.SerializationManagerServer {
     if (t == _i15.EmailAccountRequestExceptionReason) {
       return _i15.EmailAccountRequestExceptionReason.fromJson(data) as T;
     }
-    if (t == _i16.FacebookAccount) {
-      return _i16.FacebookAccount.fromJson(data) as T;
+    if (t == _i16.FacebookAccessTokenVerificationException) {
+      return _i16.FacebookAccessTokenVerificationException.fromJson(data) as T;
     }
-    if (t == _i17.FacebookIdTokenVerificationException) {
-      return _i17.FacebookIdTokenVerificationException.fromJson(data) as T;
+    if (t == _i17.FacebookAccount) {
+      return _i17.FacebookAccount.fromJson(data) as T;
     }
     if (t == _i18.FirebaseAccount) {
       return _i18.FirebaseAccount.fromJson(data) as T;
@@ -1271,14 +1271,14 @@ class Protocol extends _i1.SerializationManagerServer {
               : null)
           as T;
     }
-    if (t == _i1.getType<_i16.FacebookAccount?>()) {
-      return (data != null ? _i16.FacebookAccount.fromJson(data) : null) as T;
-    }
-    if (t == _i1.getType<_i17.FacebookIdTokenVerificationException?>()) {
+    if (t == _i1.getType<_i16.FacebookAccessTokenVerificationException?>()) {
       return (data != null
-              ? _i17.FacebookIdTokenVerificationException.fromJson(data)
+              ? _i16.FacebookAccessTokenVerificationException.fromJson(data)
               : null)
           as T;
+    }
+    if (t == _i1.getType<_i17.FacebookAccount?>()) {
+      return (data != null ? _i17.FacebookAccount.fromJson(data) : null) as T;
     }
     if (t == _i1.getType<_i18.FirebaseAccount?>()) {
       return (data != null ? _i18.FirebaseAccount.fromJson(data) : null) as T;
@@ -1393,9 +1393,9 @@ class Protocol extends _i1.SerializationManagerServer {
       _i14.EmailAccountRequestException => 'EmailAccountRequestException',
       _i15.EmailAccountRequestExceptionReason =>
         'EmailAccountRequestExceptionReason',
-      _i16.FacebookAccount => 'FacebookAccount',
-      _i17.FacebookIdTokenVerificationException =>
-        'FacebookIdTokenVerificationException',
+      _i16.FacebookAccessTokenVerificationException =>
+        'FacebookAccessTokenVerificationException',
+      _i17.FacebookAccount => 'FacebookAccount',
       _i18.FirebaseAccount => 'FirebaseAccount',
       _i19.FirebaseIdTokenVerificationException =>
         'FirebaseIdTokenVerificationException',
@@ -1456,10 +1456,10 @@ class Protocol extends _i1.SerializationManagerServer {
         return 'EmailAccountRequestException';
       case _i15.EmailAccountRequestExceptionReason():
         return 'EmailAccountRequestExceptionReason';
-      case _i16.FacebookAccount():
+      case _i16.FacebookAccessTokenVerificationException():
+        return 'FacebookAccessTokenVerificationException';
+      case _i17.FacebookAccount():
         return 'FacebookAccount';
-      case _i17.FacebookIdTokenVerificationException():
-        return 'FacebookIdTokenVerificationException';
       case _i18.FirebaseAccount():
         return 'FirebaseAccount';
       case _i19.FirebaseIdTokenVerificationException():
@@ -1542,13 +1542,13 @@ class Protocol extends _i1.SerializationManagerServer {
     if (dataClassName == 'EmailAccountRequestExceptionReason') {
       return deserialize<_i15.EmailAccountRequestExceptionReason>(data['data']);
     }
-    if (dataClassName == 'FacebookAccount') {
-      return deserialize<_i16.FacebookAccount>(data['data']);
-    }
-    if (dataClassName == 'FacebookIdTokenVerificationException') {
-      return deserialize<_i17.FacebookIdTokenVerificationException>(
+    if (dataClassName == 'FacebookAccessTokenVerificationException') {
+      return deserialize<_i16.FacebookAccessTokenVerificationException>(
         data['data'],
       );
+    }
+    if (dataClassName == 'FacebookAccount') {
+      return deserialize<_i17.FacebookAccount>(data['data']);
     }
     if (dataClassName == 'FirebaseAccount') {
       return deserialize<_i18.FirebaseAccount>(data['data']);
@@ -1631,8 +1631,8 @@ class Protocol extends _i1.SerializationManagerServer {
         return _i8.EmailAccountPasswordResetRequest.t;
       case _i9.EmailAccountRequest:
         return _i9.EmailAccountRequest.t;
-      case _i16.FacebookAccount:
-        return _i16.FacebookAccount.t;
+      case _i17.FacebookAccount:
+        return _i17.FacebookAccount.t;
       case _i18.FirebaseAccount:
         return _i18.FirebaseAccount.t;
       case _i21.GitHubAccount:

@@ -127,7 +127,7 @@ class FacebookIdpUtils {
   /// This method first verifies the token using Facebook's Debug Token API,
   /// then fetches the user's profile information from the Graph API.
   ///
-  /// Throws [FacebookIdTokenVerificationException] if the user info retrieval fails.
+  /// Throws [FacebookAccessTokenVerificationException] if the user info retrieval fails.
   Future<FacebookAccountDetails> fetchAccountDetails(
     final Session session, {
     required final String accessToken,
@@ -318,6 +318,6 @@ class FacebookIdpUtils {
 extension on Session {
   Never logAndThrow(final String message) {
     log(message, level: LogLevel.debug);
-    throw FacebookIdTokenVerificationException();
+    throw FacebookAccessTokenVerificationException();
   }
 }

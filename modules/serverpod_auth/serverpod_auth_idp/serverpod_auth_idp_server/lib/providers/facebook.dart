@@ -6,7 +6,7 @@ export 'package:serverpod_auth_core_server/serverpod_auth_core_server.dart'
     show AuthSuccess;
 
 export '../src/generated/protocol.dart'
-    show FacebookAccount, FacebookIdTokenVerificationException;
+    show FacebookAccount, FacebookAccessTokenVerificationException;
 export '../src/providers/facebook/business/facebook_idp.dart';
 export '../src/providers/facebook/business/facebook_idp_admin.dart';
 export '../src/providers/facebook/business/facebook_idp_config.dart';
