@@ -121,6 +121,10 @@ class FacebookSignInService {
 
   /// Signs in with Facebook and returns the access token.
   ///
+  /// On iOS, requests App Tracking Transparency (ATT) permission
+  /// to obtain a classic access token required for server-side Graph API validation.
+  /// On other platforms (Android, Web, MacOS), classic tokens are provided by default.
+  ///
   /// Requests the specified [permissions] from Facebook. By default, requests
   /// `public_profile` and `email` permissions.
   ///
@@ -133,9 +137,16 @@ class FacebookSignInService {
   }) async {
     final LoginResult result = await facebookAuth.login(
       permissions: permissions,
+      loginTracking: defaultTargetPlatform == TargetPlatform.iOS
+          ? LoginTracking.enabled
+          : LoginTracking.limited,
     );
 
     if (result.status == LoginStatus.success) {
+      if (result.accessToken?.type == AccessTokenType.limited) {
+        throw FacebookLimitedAccessTokenException();
+      }
+
       return result.accessToken?.tokenString;
     } else if (result.status == LoginStatus.cancelled) {
       return null;
@@ -211,4 +222,22 @@ String? _getAppIdFromEnvVar() {
   return const bool.hasEnvironment('FACEBOOK_APP_ID')
       ? const String.fromEnvironment('FACEBOOK_APP_ID')
       : null;
+}
+
+/// Exception thrown when a limited access token is received from Facebook.
+///
+/// Limited access tokens cannot be validated on the server side and occur when:
+/// - User denies App Tracking Transparency (ATT) permission on iOS 14.5+
+/// - App doesn't request tracking permission properly
+///
+/// To avoid this, the app must:
+/// 1. Request ATT permission before Facebook sign-in
+/// 2. Use LoginTracking.enabled on iOS/macOS platforms
+class FacebookLimitedAccessTokenException implements Exception {
+  @override
+  String toString() =>
+      'Facebook returned a limited access token which cannot be validated on '
+      'the server. On iOS and macOS, App Tracking Transparency permission is '
+      'required to obtain a standard access token. Please enable tracking '
+      'permission and try again.';
 }
